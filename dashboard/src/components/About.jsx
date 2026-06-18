@@ -23,9 +23,14 @@ export default function About({ meta }) {
         </li>
         <li>
           <span className="text-sky-300">●</span> Conversion probabilities come
-          from a gradient-boosting model whose probabilities are{" "}
-          <span className="font-semibold text-slate-200">calibrated</span> — that
-          is why the allocation engine can trust them as real probabilities.
+          from a gradient-boosting model. The engine consumes its{" "}
+          <span className="font-semibold text-slate-200">raw probabilities</span>,
+          which were{" "}
+          <span className="font-semibold text-slate-200">
+            verified well-calibrated
+          </span>{" "}
+          (reliability check, worst-bin gap 0.082) — that is why the allocation
+          engine can treat them as real probabilities.
         </li>
         <li>
           <span className="text-amber-300">●</span>{" "}
@@ -33,6 +38,16 @@ export default function About({ meta }) {
           derived from occupation (e.g. working professional weighted higher),{" "}
           <span className="italic">not real revenue</span> — the dataset has no
           deal sizes. The relative weights are an explicit modeling assumption.
+        </li>
+        <li>
+          <span className="text-violet-300">●</span> Allocation uses{" "}
+          <span className="font-semibold text-slate-200">
+            uncertainty-aware Thompson Sampling with a fixed prior
+          </span>{" "}
+          derived from the model's probabilities. It does{" "}
+          <span className="italic">not</span> learn online — an outcome feedback
+          loop is designed but not yet implemented, so today's allocation is
+          one-shot batch selection, not live learning.
         </li>
         <li>
           <span className="text-slate-400">●</span> Any chat / conversation layer
