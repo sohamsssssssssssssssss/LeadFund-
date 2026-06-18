@@ -1,41 +1,52 @@
 # LeadFund — Autonomous Lead Allocation Engine
 
-> _One-paragraph description goes here. (Provided by project owner — replace this placeholder.)_
+Sales teams almost always have more leads than time, so rep hours get spent on the wrong prospects and revenue quietly leaks out. LeadFund treats rep capacity like investment capital: it scores every lead, assigns each an expected value, and allocates the limited contact budget to maximize total value captured — not just raw conversion count. It is proven end to end on real data with real outcomes.
 
-## Project structure
+## Key result
 
-```
-leadfund/
-  data/          # raw + processed datasets (git-ignored, never committed)
-    raw/
-    processed/
-  src/           # scoring, allocation, backtest modules
-  notebooks/     # exploration
-  dashboard/     # frontend (later)
-  README.md
-```
+On 9,240 real X Education leads with real conversion labels (a 1,848-lead held-out test set), value-aware allocation captures about **26% of total value at a 5% contact budget**, versus about **22% for a naive probability sort** — a real edge of **+4.27 percentage points**. The advantage is largest exactly when it matters most: when contact capacity is scarcest. As the budget grows, the strategies converge and the gap closes to a near-tie, which the dashboard shows honestly rather than hiding.
 
-## How to run
+## How it works
 
-> _Setup and usage instructions — to be filled in._
+1. **Real lead scoring.** A gradient-boosting model produces per-lead conversion probabilities, with calibration checked (reliability bins + Brier score) so the probabilities can be trusted as real probabilities by the allocation layer. Leakage and post-intake columns (e.g. Tags, Lead Quality, Last Activity, Last Notable Activity) and identifiers are dropped on purpose, so the reported ROC-AUC of about **0.86** is honest and not inflated by columns a model would never have at lead-intake time.
 
-### 1. Create and activate the virtual environment
+2. **Value-weighted Thompson Sampling allocation.** Each lead's conversion rate is modeled as a Beta distribution centered on its predicted probability, with a prior strength that controls how much we trust the point estimate versus allow for uncertainty. Sampled rates are multiplied by each lead's expected value, and the highest expected-value leads are selected. This lets a slightly lower-probability but higher-value lead outrank a confident low-value one — something a plain sort can never do.
+
+3. **Backtest against real outcomes.** Every strategy (random, probability sort, Thompson, value sort, value-aware Thompson) is replayed over the real test set across budgets of 5/10/20/30/50%. The headline metric is the fraction of total real value captured, reported alongside conversion capture. Results are written to `data/processed/backtest_results.csv` and surfaced in the dashboard.
+
+## Honesty / limitations
+
+This is a strength of the project, not a disclaimer to bury:
+
+- **Value is a stated proxy, not real revenue.** It is derived from occupation (for example, working professionals are weighted higher than students), using explicit relative weights that are a modeling assumption.
+- **The dataset has conversion labels but no deal sizes.** There is no real monetary value in the source data, which is precisely why value is a proxy.
+- **The chat layer is simulated.** Real sales conversations are not publicly available, so any conversational layer is illustrative rather than trained on real transcripts.
+
+## Run it
+
+Requires Python 3.11 and Node.js. Place the X Education CSV in `data/raw/`.
 
 ```bash
+# 1. Environment
 python3.11 -m venv .venv
 source .venv/bin/activate
-```
-
-### 2. Install dependencies
-
-```bash
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# 2. Pipeline (run from the project root so the data/ paths resolve)
+PYTHONPATH=src python -m data_prep   # clean + split, writes data/processed/{train,test}.csv
+PYTHONPATH=src python -m scoring     # train models, writes data/processed/scored_leads.csv
+PYTHONPATH=src python -m backtest    # allocation backtest, writes backtest_results.csv
+
+# 3. Refresh the dashboard data (regenerates the JSON the frontend reads)
+PYTHONPATH=src python -m export_dashboard
+
+# 4. Dashboard
+cd dashboard
+npm install
+npm run dev        # http://localhost:5173
 ```
 
-### 3. (Later) Launch notebooks / dashboard
+## Tech stack
 
-```bash
-jupyter lab        # exploration in notebooks/
-```
-# LeadFund-
+Python 3.11, scikit-learn, React + Vite + Tailwind.

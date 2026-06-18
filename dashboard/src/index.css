@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink text-slate-200 font-sans antialiased;
+  /* Subtle quant-terminal backdrop: faint grid + radial glow. */
+  background-image:
+    radial-gradient(1200px 600px at 70% -10%, rgba(52, 211, 153, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 10% 0%, rgba(56, 189, 248, 0.05), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* Tabular figures so animated counters don't jitter horizontally. */
+.nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Thin scrollbars inside data panels. */
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  @apply bg-edge rounded-full;
+}
