@@ -2,20 +2,30 @@ import React, { useEffect, useRef, useState } from "react";
 import { lookup, pct, pp, budgetLabel } from "../lib/format";
 
 /**
- * Race — the hero. A side-by-side animated race between the two strategies on
- * the REAL value-capture numbers for the selected budget:
+ * Race — the hero. A side-by-side race between the two strategies on the REAL
+ * value numbers for the selected budget:
  *   LEFT  "Naive Sort"  = strategy "sort"            (prob-only)
  *   RIGHT "LeadFund"    = strategy "thompson_value"  (value-aware Thompson)
  *
- * On Run, both counters climb (eased) toward their true value-capture rate and
- * a 100-dot grid fills to that percentage. Every target comes from props.data;
- * nothing here is hardcoded.
+ * Design intent: make the GAP the hero. The old version mapped each strategy
+ * onto a 0-100%-of-total bar, so a real edge (26.2% vs 22.0%) read as a near-
+ * tie. Here the headline is the RELATIVE value lift (+19.5% more value), the
+ * cards show value UNITS captured on a leader-relative bar (264 vs 221 visibly
+ * differ), and the honest share-of-total ("+Xpp") stays as secondary context.
+ *
+ * Every number is derived from props.data (backtest.json) — nothing hardcoded.
  */
 
-const DOTS = 100; // each dot = 1% of total realisable value captured
 const DURATION = 2200; // ms
 
-// Animate two counters from 0 to their targets; re-arm whenever targets change.
+// Format value-unit figures: integer when whole, else one decimal. Real values
+// land on .0/.5; during the animation they count up smoothly.
+const fmtUnits = (n) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
+// Signed relative-lift percentage, e.g. "+19.5%" / "-0.3%".
+const fmtLift = (frac) => `${frac >= 0 ? "+" : ""}${(frac * 100).toFixed(1)}%`;
+
+// Animate two rates from 0 to their targets; re-arm whenever targets (budget)
+// change. easeOutCubic so the counters decelerate into the real end state.
 function useRace(targetNaive, targetLF) {
   const [vals, setVals] = useState({ naive: 0, lf: 0 });
   const [running, setRunning] = useState(false);
@@ -53,26 +63,7 @@ function useRace(targetNaive, targetLF) {
   return { vals, running, hasRun, run };
 }
 
-function DotGrid({ filled, accent }) {
-  // filled = fraction in [0,1]; render DOTS cells, light up the first N.
-  const n = Math.round(filled * DOTS);
-  return (
-    <div className="grid grid-cols-10 gap-1">
-      {Array.from({ length: DOTS }).map((_, i) => (
-        <div
-          key={i}
-          className="aspect-square rounded-[3px] transition-colors duration-300"
-          style={{
-            backgroundColor: i < n ? accent : "rgba(148,163,184,0.10)",
-            boxShadow: i < n ? `0 0 6px ${accent}55` : "none",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Runner({ title, subtitle, accent, value, isWinner }) {
+function Runner({ title, subtitle, accent, units, rate, barFrac, isWinner }) {
   return (
     <div
       className="flex-1 rounded-2xl border bg-panel/70 p-5 transition-shadow"
@@ -81,7 +72,7 @@ function Runner({ title, subtitle, accent, value, isWinner }) {
         boxShadow: isWinner ? `0 0 30px ${accent}22` : "none",
       }}
     >
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold tracking-wide text-slate-100">
             {title}
@@ -94,30 +85,35 @@ function Runner({ title, subtitle, accent, value, isWinner }) {
         />
       </div>
 
-      <div className="mb-4 flex items-baseline gap-2">
+      {/* Value UNITS captured — the primary number on each card. */}
+      <div className="flex items-baseline gap-2">
         <span
           className="nums text-5xl font-bold tracking-tight"
           style={{ color: accent }}
         >
-          {pct(value, 1)}
+          {fmtUnits(units)}
         </span>
-        <span className="text-xs text-slate-500">of total value</span>
+        <span className="text-xs text-slate-500">value units captured</span>
       </div>
+      {/* Share-of-total as honest secondary context. */}
+      <p className="nums mt-1 text-xs text-slate-500">
+        {pct(rate)} of total realisable value
+      </p>
 
-      {/* progress bar */}
-      <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-edge/60">
+      {/* Leader-relative bar: width = units / max(both units). Both start at 0,
+          so this is an honest head-to-head of units, not a 0-100% axis. */}
+      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-edge/60">
         <div
           className="h-full rounded-full transition-[width] duration-150 ease-out"
-          style={{ width: `${value * 100}%`, backgroundColor: accent }}
+          style={{ width: `${barFrac * 100}%`, backgroundColor: accent }}
         />
       </div>
-
-      <DotGrid filled={value} accent={accent} />
     </div>
   );
 }
 
 export default function Race({ data, budget, budgets, onBudgetChange }) {
+  const totalValue = data.meta.totalValue;
   const naiveRow = lookup(data.results, "sort", budget);
   const lfRow = lookup(data.results, "thompson_value", budget);
   const targetNaive = naiveRow.valueCaptureRate;
@@ -125,10 +121,25 @@ export default function Race({ data, budget, budgets, onBudgetChange }) {
 
   const { vals, running, hasRun, run } = useRace(targetNaive, targetLF);
 
-  // Live gap follows the animation; final value is the real number.
+  // Everything below is derived from the two animated rates, so the hero,
+  // unit counters, and bars move together and snap to the real end state.
+  const naiveUnits = vals.naive * totalValue;
+  const lfUnits = vals.lf * totalValue;
+  const deltaUnits = lfUnits - naiveUnits;
+  const relLift = vals.naive > 0 ? vals.lf / vals.naive - 1 : 0;
   const gapPp = (vals.lf - vals.naive) * 100;
+  const leaderMax = Math.max(naiveUnits, lfUnits, 1e-9);
+
+  // Real (target) end state — used for winner styling and the bottom readout,
+  // so they don't depend on mid-animation values.
+  const finalNaiveUnits = targetNaive * totalValue;
+  const finalLfUnits = targetLF * totalValue;
   const finalGapPp = (targetLF - targetNaive) * 100;
+  const finalRelLift = targetNaive > 0 ? targetLF / targetNaive - 1 : 0;
+  const isTie = Math.abs(finalGapPp) < 0.1;
   const lfAhead = targetLF >= targetNaive;
+
+  const heroColor = lfAhead ? "#34d399" : "#f87171";
   const budgetIdx = budgets.findIndex((b) => Math.abs(b - budget) < 1e-9);
 
   return (
@@ -189,62 +200,87 @@ export default function Race({ data, budget, budgets, onBudgetChange }) {
         </div>
       </div>
 
-      {/* The two runners + the gap badge between them. */}
+      {/* HERO band — the single number to remember: relative value lift. */}
+      <div
+        className={`mb-6 rounded-2xl border px-6 py-7 text-center ${
+          hasRun && !running ? "animate-pulseGap" : ""
+        }`}
+        style={{
+          borderColor: `${heroColor}55`,
+          backgroundColor: `${heroColor}10`,
+        }}
+      >
+        <div
+          className="nums text-6xl font-extrabold leading-none tracking-tight sm:text-7xl"
+          style={{ color: heroColor }}
+        >
+          {fmtLift(relLift)}
+        </div>
+        <p className="mt-3 text-sm text-slate-300">
+          {lfAhead ? "more" : "less"} total value captured for the same{" "}
+          <span className="font-semibold text-slate-100">
+            {budgetLabel(budget)}
+          </span>{" "}
+          contact budget
+        </p>
+        <p className="nums mt-1 text-xs text-slate-500">
+          {deltaUnits >= 0 ? "+" : ""}
+          {fmtUnits(deltaUnits)} value units · {pp(gapPp)} of total
+        </p>
+      </div>
+
+      {/* Two runner cards — value units on a leader-relative bar. */}
       <div className="flex flex-col items-stretch gap-4 lg:flex-row">
         <Runner
           title="Naive Sort"
           subtitle="prob-only ranking — what everyone builds"
           accent="#94a3b8"
-          value={vals.naive}
-          isWinner={false}
+          units={naiveUnits}
+          rate={vals.naive}
+          barFrac={naiveUnits / leaderMax}
+          isWinner={!isTie && !lfAhead}
         />
-
-        <div className="flex flex-col items-center justify-center gap-2 px-2">
-          <span className="text-[10px] uppercase tracking-widest text-slate-500">
-            value gap
-          </span>
-          <div
-            className={`nums rounded-xl border px-4 py-3 text-center ${
-              hasRun && !running ? "animate-pulseGap" : ""
-            }`}
-            style={{
-              borderColor: lfAhead ? "#34d39966" : "#f8717166",
-              backgroundColor: lfAhead ? "#34d39911" : "#f8717111",
-            }}
-          >
-            <div
-              className="text-2xl font-extrabold"
-              style={{ color: lfAhead ? "#34d399" : "#f87171" }}
-            >
-              {pp(gapPp)}
-            </div>
-            <div className="text-[10px] text-slate-500">LeadFund vs Naive</div>
-          </div>
-          {hasRun && !running && Math.abs(finalGapPp) < 0.1 && (
-            <span className="max-w-[8rem] text-center text-[10px] leading-tight text-slate-500">
-              near-tie at this budget — and we own that
-            </span>
-          )}
-        </div>
-
         <Runner
           title="LeadFund"
           subtitle="value-aware Thompson allocation"
           accent="#34d399"
-          value={vals.lf}
-          isWinner={lfAhead}
+          units={lfUnits}
+          rate={vals.lf}
+          barFrac={lfUnits / leaderMax}
+          isWinner={!isTie && lfAhead}
         />
       </div>
 
-      {/* Plain-language readout of the real end state. */}
+      {/* Plain-language readout of the REAL end state, branching on real gap. */}
       <p className="mt-5 text-center text-sm text-slate-400">
-        At a <span className="font-semibold text-slate-200">{budgetLabel(budget)}</span>{" "}
-        budget, LeadFund captures{" "}
-        <span className="nums font-semibold text-leadfund">{pct(targetLF)}</span>{" "}
-        of total value vs Naive Sort's{" "}
-        <span className="nums font-semibold text-naive">{pct(targetNaive)}</span>{" "}
-        — a real edge of{" "}
-        <span className="nums font-semibold text-slate-100">{pp(finalGapPp)}</span>.
+        {isTie ? (
+          <>
+            A dead heat, and we own that: when you can contact a third of your
+            leads, ranking is enough.
+          </>
+        ) : finalGapPp > 0 ? (
+          <>
+            LeadFund captures{" "}
+            <span className="nums font-semibold text-leadfund">
+              {fmtUnits(finalLfUnits)}
+            </span>{" "}
+            value units vs Naive Sort's{" "}
+            <span className="nums font-semibold text-naive">
+              {fmtUnits(finalNaiveUnits)}
+            </span>{" "}
+            —{" "}
+            <span className="nums font-semibold text-slate-100">
+              {fmtLift(finalRelLift)}
+            </span>{" "}
+            more value ({pp(finalGapPp)} of total). The edge is largest when
+            contact capacity is scarcest.
+          </>
+        ) : (
+          <>
+            Naive edges ahead by a hair ({pp(finalGapPp)}); at this budget you
+            contact nearly everyone, so allocation stops mattering.
+          </>
+        )}
       </p>
     </section>
   );
