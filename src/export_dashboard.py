@@ -34,6 +34,7 @@ from value import OCCUPATION_COL, _normalise
 
 BACKTEST_CSV = "data/processed/backtest_results.csv"
 SCORED_CSV = "data/processed/scored_leads.csv"
+CONFIDENCE_CSV = "data/processed/confidence_intervals.csv"
 RAW_DIR = "data/raw"
 OUT_JSON = "dashboard/src/data/backtest.json"
 
@@ -124,7 +125,32 @@ def build_payload() -> dict:
         },
         # oracle ceiling headline: how close each gets to perfect (hindsight).
         "oracle": {f"{b}": _oracle(results, b) for b in BUDGETS},
+        # 95% bootstrap confidence intervals on the headline metrics (if computed).
+        "confidence": _confidence(),
     }
+
+
+def _confidence() -> dict:
+    """Load bootstrap CIs (per budget) if present; else empty. Keyed by budget."""
+    if not os.path.exists(CONFIDENCE_CSV):
+        return {}
+    ci = pd.read_csv(CONFIDENCE_CSV)
+    out = {}
+    for _, r in ci.iterrows():
+        out[f"{float(r['budget'])}"] = {
+            "nBootstrap": int(r["n_bootstrap"]),
+            "valueCapture": {"mean": float(r["tv_value_capture_mean"]),
+                             "ciLow": float(r["tv_value_capture_ci_low"]),
+                             "ciHigh": float(r["tv_value_capture_ci_high"])},
+            "edgePp": {"mean": float(r["edge_pp_mean"]),
+                       "ciLow": float(r["edge_pp_ci_low"]),
+                       "ciHigh": float(r["edge_pp_ci_high"]),
+                       "significant": bool(r["edge_significant"])},
+            "pctOfOracle": {"mean": float(r["pct_of_oracle_mean"]),
+                            "ciLow": float(r["pct_of_oracle_ci_low"]),
+                            "ciHigh": float(r["pct_of_oracle_ci_high"])},
+        }
+    return out
 
 
 def _oracle(results: pd.DataFrame, budget: float) -> dict:
