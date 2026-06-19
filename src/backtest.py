@@ -49,6 +49,7 @@ import pandas as pd
 from allocation import (
     PROB_COL,
     VALUE_COL,
+    allocate_oracle,
     allocate_random,
     allocate_sort,
     allocate_sort_value,
@@ -66,8 +67,11 @@ RANDOM_STATE = 42
 # Two rates are a TIE if they differ by less than this (i.e. identical capture).
 TIE_EPS = 1e-9
 
-# Strategy display order for the tables.
-STRATEGY_ORDER = ["random", "sort", "thompson", "sort_value", "thompson_value"]
+# Strategy display order for the tables. "oracle" is the hindsight ceiling
+# (NOT a real strategy — see allocation.allocate_oracle); it appears last.
+STRATEGY_ORDER = ["random", "sort", "thompson", "sort_value", "thompson_value", "oracle"]
+# Columns for the "% of oracle" table: the real strategies, plus oracle (=100%).
+ORACLE_PCT_ORDER = ["random", "sort", "sort_value", "thompson_value", "oracle"]
 
 
 def load_scored(path: str = SCORED_PATH) -> pd.DataFrame:
@@ -121,11 +125,24 @@ def run_backtest(leads: pd.DataFrame,
             "sort_value": allocate_sort_value(leads, budget),
             "thompson_value": allocate_thompson_value(leads, budget,
                                                       random_state=random_state),
+            # Hindsight ceiling — uses real outcomes; not a deployable strategy.
+            "oracle": allocate_oracle(leads, budget),
         }
+        budget_rows = []
         for strategy, selected in selections.items():
             m = _metrics(leads, selected, total_conversions, total_value)
             m.update({"budget": budget, "strategy": strategy})
-            rows.append(m)
+            budget_rows.append(m)
+
+        # "% of oracle" = how close each strategy gets to the perfect (oracle)
+        # value capture at this budget. Oracle is the best possible, so 100%.
+        oracle_value = next(r["value_captured"] for r in budget_rows
+                            if r["strategy"] == "oracle")
+        for r in budget_rows:
+            r["oracle_value_captured"] = oracle_value
+            r["pct_of_oracle"] = (r["value_captured"] / oracle_value
+                                  if oracle_value else 0.0)
+        rows.extend(budget_rows)
 
     results = pd.DataFrame(rows)
     results.attrs["n_leads"] = n_leads
@@ -142,16 +159,17 @@ def _verdict(challenger: float, baseline: float) -> tuple[str, float]:
     return ("BEAT", delta_pp) if delta_pp > 0 else ("LOST", delta_pp)
 
 
-def _print_pivot(results: pd.DataFrame, value_col: str, title: str) -> pd.DataFrame:
+def _print_pivot(results: pd.DataFrame, value_col: str, title: str,
+                 order: list[str] = STRATEGY_ORDER) -> pd.DataFrame:
     pivot = results.pivot(index="budget", columns="strategy", values=value_col)
-    pivot = pivot[STRATEGY_ORDER]
-    cols = "".join(f" | {s:>14}" for s in STRATEGY_ORDER)
+    pivot = pivot[order]
+    cols = "".join(f" | {s:>14}" for s in order)
     header = f"{'budget':>7}{cols}"
     print(f"\n{title}")
     print(header)
     print("-" * len(header))
     for budget, row in pivot.iterrows():
-        cells = "".join(f" | {row[s]:>13.1%}" for s in STRATEGY_ORDER)
+        cells = "".join(f" | {row[s]:>13.1%}" for s in order)
         print(f"{budget:>6.0%}{cells}")
     return pivot
 
@@ -171,9 +189,17 @@ def print_report(results: pd.DataFrame) -> None:
     # (a) Conversion capture.
     _print_pivot(results, "capture_rate", "(a) % of REAL conversions captured")
 
-    # (b) Value capture.
+    # (b) Value capture. (Rightmost "oracle" column = hindsight ceiling.)
     vpivot = _print_pivot(results, "value_capture_rate",
-                          "(b) % of total VALUE captured")
+                          "(b) % of total VALUE captured  (oracle = hindsight ceiling)")
+
+    # (c) % of oracle — how close each REAL strategy gets to perfect at each
+    #     budget. Oracle itself is 100% by definition (it IS the ceiling).
+    opivot = _print_pivot(
+        results, "pct_of_oracle",
+        "(c) % of ORACLE captured  (oracle = theoretical best, hindsight only)",
+        order=ORACLE_PCT_ORDER,
+    )
 
     # ---- Honest verdicts on the VALUE metric ---------------------------- #
     print("\nValue-aware vs. baselines (VALUE capture, percentage points):")
@@ -206,6 +232,17 @@ def print_report(results: pd.DataFrame) -> None:
         print("  Value-awareness did NOT increase value capture here — reported straight.")
     else:
         print("  -> Value-aware allocation captures more VALUE than naive prob-sorting.")
+
+    # ---- Headline: how close LeadFund gets to the theoretical maximum ---- #
+    print("\nHEADLINE — % of the theoretical maximum (oracle, hindsight) that")
+    print("LeadFund (thompson_value) captures at each budget:")
+    for budget in opivot.index:
+        lf = opivot.loc[budget, "thompson_value"]
+        naive = opivot.loc[budget, "sort"]
+        print(f"  {budget:>5.0%}: LeadFund = {lf:>6.1%} of perfect   "
+              f"(naive sort = {naive:.1%})")
+    print("  Reminder: oracle uses real outcomes (perfect hindsight) and is NOT")
+    print("  a deployable strategy — it is only the ceiling for comparison.")
     print("=" * 96)
 
 

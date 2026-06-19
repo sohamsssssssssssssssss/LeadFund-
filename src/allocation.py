@@ -26,12 +26,16 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-# Column carrying the (calibrated) gradient-boosting conversion probability.
+# Column carrying the raw gradient-boosting conversion probability (verified
+# well-calibrated; see scoring.py). This is what the real strategies rank on.
 PROB_COL = "prob_gradient_boosting"
 # Column carrying the per-lead expected-value proxy (see value.py). If absent,
 # every lead is treated as equal value (1.0), which makes the value-aware
 # strategies collapse back onto the probability-only ones.
 VALUE_COL = "expected_value"
+# Real conversion outcome (0/1). Used ONLY by the oracle ceiling below — no real
+# strategy is allowed to look at this, since it isn't known at allocation time.
+TARGET_COL = "Converted"
 
 
 def _n_select(n_leads: int, budget: float) -> int:
@@ -236,12 +240,47 @@ def allocate_thompson_value(leads: pd.DataFrame, budget: float,
     return leads.index.to_numpy()[positions]
 
 
+# --------------------------------------------------------------------------- #
+# ORACLE — the hindsight ceiling (NOT a real strategy)
+# --------------------------------------------------------------------------- #
+
+def allocate_oracle(leads: pd.DataFrame, budget: float) -> np.ndarray:
+    """
+    THEORETICAL UPPER BOUND — the best ANY allocator could possibly do.
+
+    !!! THIS IS NOT A DEPLOYABLE STRATEGY. IT CHEATS WITH PERFECT HINDSIGHT. !!!
+    It looks at the real `Converted` outcomes — information that does NOT exist
+    at allocation time — and picks the budget% of leads that maximise ACTUAL
+    realised value. Concretely it ranks by (Converted * expected_value): leads
+    that genuinely converted, highest value first; non-converters score 0 and
+    are taken last only to fill the budget.
+
+    Its only purpose is to be the CEILING: "% of oracle captured" tells us how
+    close a real strategy gets to perfect at a given budget. Never present it as
+    a real strategy, and never let a real strategy read TARGET_COL.
+    """
+    if TARGET_COL not in leads.columns:
+        raise KeyError(
+            f"'{TARGET_COL}' column required for the oracle ceiling (it needs "
+            f"the real outcomes). Not found in leads."
+        )
+    realised_value = (
+        leads[TARGET_COL].to_numpy(dtype=float) * _values(leads)
+    )  # value that ACTUALLY converted
+    k = _n_select(len(leads), budget)
+    order = np.argsort(-realised_value, kind="stable")
+    positions = order[:k]
+    return leads.index.to_numpy()[positions]
+
+
 # Registry so the backtest can iterate strategies by name. Ordered to show the
-# full progression: floor -> prob-only -> value-aware.
+# full progression: floor -> prob-only -> value-aware -> oracle ceiling.
+# NOTE: "oracle" is a hindsight upper bound, not a real strategy (see above).
 STRATEGIES = {
     "random": allocate_random,
     "sort": allocate_sort,
     "thompson": allocate_thompson,
     "sort_value": allocate_sort_value,
     "thompson_value": allocate_thompson_value,
+    "oracle": allocate_oracle,
 }

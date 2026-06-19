@@ -67,7 +67,8 @@ def build_payload() -> dict:
         "totalValue": round(total_value, 1),
     }
 
-    # Tidy results list (round for display; keep raw rates as floats).
+    # Tidy results list (round for display; keep raw rates as floats). Includes
+    # the "oracle" rows (hindsight ceiling) and each strategy's pctOfOracle.
     result_rows = [
         {
             "budget": float(r["budget"]),
@@ -78,6 +79,9 @@ def build_payload() -> dict:
             "valueCaptured": float(r["value_captured"]),
             "valueCaptureRate": float(r["value_capture_rate"]),
             "efficiency": float(r["efficiency"]),
+            # oracle ceiling fields (present for every row)
+            "oracleValueCaptured": float(r["oracle_value_captured"]),
+            "pctOfOracle": float(r["pct_of_oracle"]),
         }
         for _, r in results.iterrows()
     ]
@@ -118,6 +122,20 @@ def build_payload() -> dict:
         "valueGap": {  # value_capture_rate: leadfund(thompson_value) - naive sort
             f"{b}": _gap(results, b) for b in BUDGETS
         },
+        # oracle ceiling headline: how close each gets to perfect (hindsight).
+        "oracle": {f"{b}": _oracle(results, b) for b in BUDGETS},
+    }
+
+
+def _oracle(results: pd.DataFrame, budget: float) -> dict:
+    """LeadFund / naive % of the oracle (hindsight) ceiling at a budget."""
+    at = results[results["budget"] == budget]
+    def pof(strategy):
+        return float(at[at["strategy"] == strategy]["pct_of_oracle"].iloc[0])
+    return {
+        "leadfund": pof("thompson_value"),   # % of perfect
+        "naiveSort": pof("sort"),
+        "oracleValue": float(at["oracle_value_captured"].iloc[0]),
     }
 
 

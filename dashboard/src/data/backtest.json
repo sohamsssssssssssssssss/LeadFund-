@@ -21,7 +21,9 @@
       "captureRate": 0.0491573033707865,
       "valueCaptured": 54.0,
       "valueCaptureRate": 0.0536779324055666,
-      "efficiency": 0.3804347826086957
+      "efficiency": 0.3804347826086957,
+      "oracleValueCaptured": 276.0,
+      "pctOfOracle": 0.1956521739130435
     },
     {
       "budget": 0.05,
@@ -31,7 +33,9 @@
       "captureRate": 0.1207865168539325,
       "valueCaptured": 221.0,
       "valueCaptureRate": 0.2196819085487077,
-      "efficiency": 0.9347826086956522
+      "efficiency": 0.9347826086956522,
+      "oracleValueCaptured": 276.0,
+      "pctOfOracle": 0.8007246376811594
     },
     {
       "budget": 0.05,
@@ -41,7 +45,9 @@
       "captureRate": 0.1207865168539325,
       "valueCaptured": 215.0,
       "valueCaptureRate": 0.2137176938369781,
-      "efficiency": 0.9347826086956522
+      "efficiency": 0.9347826086956522,
+      "oracleValueCaptured": 276.0,
+      "pctOfOracle": 0.7789855072463768
     },
     {
       "budget": 0.05,
@@ -51,7 +57,9 @@
       "captureRate": 0.122191011235955,
       "valueCaptured": 261.0,
       "valueCaptureRate": 0.2594433399602385,
-      "efficiency": 0.9456521739130436
+      "efficiency": 0.9456521739130436,
+      "oracleValueCaptured": 276.0,
+      "pctOfOracle": 0.9456521739130436
     },
     {
       "budget": 0.05,
@@ -61,7 +69,21 @@
       "captureRate": 0.1235955056179775,
       "valueCaptured": 264.0,
       "valueCaptureRate": 0.2624254473161034,
-      "efficiency": 0.9565217391304348
+      "efficiency": 0.9565217391304348,
+      "oracleValueCaptured": 276.0,
+      "pctOfOracle": 0.9565217391304348
+    },
+    {
+      "budget": 0.05,
+      "strategy": "oracle",
+      "nContacted": 92,
+      "conversionsCaptured": 92,
+      "captureRate": 0.1292134831460674,
+      "valueCaptured": 276.0,
+      "valueCaptureRate": 0.2743538767395626,
+      "efficiency": 1.0,
+      "oracleValueCaptured": 276.0,
+      "pctOfOracle": 1.0
     },
     {
       "budget": 0.1,
@@ -71,7 +93,9 @@
       "captureRate": 0.1039325842696629,
       "valueCaptured": 103.0,
       "valueCaptureRate": 0.1023856858846918,
-      "efficiency": 0.4
+      "efficiency": 0.4,
+      "oracleValueCaptured": 463.0,
+      "pctOfOracle": 0.2224622030237581
     },
     {
       "budget": 0.1,
@@ -81,7 +105,9 @@
       "captureRate": 0.2387640449438202,
       "valueCaptured": 387.5,
       "valueCaptureRate": 0.3851888667992048,
-      "efficiency": 0.918918918918919
+      "efficiency": 0.918918918918919,
+      "oracleValueCaptured": 463.0,
+      "pctOfOracle": 0.8369330453563715
     },
     {
       "budget": 0.1,
@@ -91,7 +117,9 @@
       "captureRate": 0.2359550561797752,
       "valueCaptured": 383.5,
       "valueCaptureRate": 0.3812127236580517,
-      "efficiency": 0.9081081081081082
+      "efficiency": 0.9081081081081082,
+      "oracleValueCaptured": 463.0,
+      "pctOfOracle": 0.82829373650108
     },
     {
       "budget": 0.1,
@@ -101,7 +129,9 @@
       "captureRate": 0.2289325842696629,
       "valueCaptured": 413.5,
       "valueCaptureRate": 0.4110337972166998,
-      "efficiency": 0.8810810810810811
+      "efficiency": 0.8810810810810811,
+      "oracleValueCaptured": 463.0,
+      "pctOfOracle": 0.8930885529157667
     },
     {
       "budget": 0.1,
@@ -111,7 +141,21 @@
       "captureRate": 0.2275280898876404,
       "valueCaptured": 415.5,
       "valueCaptureRate": 0.4130218687872763,
-      "efficiency": 0.8756756756756757
+      "efficiency": 0.8756756756756757,
+      "oracleValueCaptured": 463.0,
+      "pctOfOracle": 0.8974082073434125
+    },
+    {
+      "budget": 0.1,
+      "strategy": "oracle",
+      "nContacted": 185,
+      "conversionsCaptured": 185,
+      "captureRate": 0.2598314606741573,
+      "valueCaptured": 463.0,
+      "valueCaptureRate": 0.4602385685884692,
+      "efficiency": 1.0,
+      "oracleValueCaptured": 463.0,
+      "pctOfOracle": 1.0
     },
     {
       "budget": 0.2,
@@ -121,7 +165,9 @@
       "captureRate": 0.1882022471910112,
       "valueCaptured": 183.0,
       "valueCaptureRate": 0.1819085487077534,
-      "efficiency": 0.3621621621621622
+      "efficiency": 0.3621621621621622,
+      "oracleValueCaptured": 664.0,
+      "pctOfOracle": 0.2756024096385542
     },
     {
       "budget": 0.2,
@@ -131,7 +177,9 @@
       "captureRate": 0.4325842696629213,
       "valueCaptured": 551.0,
       "valueCaptureRate": 0.547713717693837,
-      "efficiency": 0.8324324324324325
+      "efficiency": 0.8324324324324325,
+      "oracleValueCaptured": 664.0,
+      "pctOfOracle": 0.8298192771084337
     },
     {
       "budget": 0.2,
@@ -141,7 +189,9 @@
       "captureRate": 0.4410112359550562,
       "valueCaptured": 557.0,
       "valueCaptureRate": 0.5536779324055666,
-      "efficiency": 0.8486486486486486
+      "efficiency": 0.8486486486486486,
+      "oracleValueCaptured": 664.0,
+      "pctOfOracle": 0.838855421686747
     },
     {
       "budget": 0.2,
@@ -151,7 +201,9 @@
       "captureRate": 0.4311797752808989,
       "valueCaptured": 562.5,
       "valueCaptureRate": 0.5591451292246521,
-      "efficiency": 0.8297297297297297
+      "efficiency": 0.8297297297297297,
+      "oracleValueCaptured": 664.0,
+      "pctOfOracle": 0.8471385542168675
     },
     {
       "budget": 0.2,
@@ -161,7 +213,21 @@
       "captureRate": 0.4311797752808989,
       "valueCaptured": 565.0,
       "valueCaptureRate": 0.5616302186878728,
-      "efficiency": 0.8297297297297297
+      "efficiency": 0.8297297297297297,
+      "oracleValueCaptured": 664.0,
+      "pctOfOracle": 0.8509036144578314
+    },
+    {
+      "budget": 0.2,
+      "strategy": "oracle",
+      "nContacted": 370,
+      "conversionsCaptured": 370,
+      "captureRate": 0.5196629213483146,
+      "valueCaptured": 664.0,
+      "valueCaptureRate": 0.6600397614314115,
+      "efficiency": 1.0,
+      "oracleValueCaptured": 664.0,
+      "pctOfOracle": 1.0
     },
     {
       "budget": 0.3,
@@ -171,7 +237,9 @@
       "captureRate": 0.2935393258426966,
       "valueCaptured": 269.5,
       "valueCaptureRate": 0.2678926441351889,
-      "efficiency": 0.3772563176895306
+      "efficiency": 0.3772563176895306,
+      "oracleValueCaptured": 848.0,
+      "pctOfOracle": 0.3178066037735849
     },
     {
       "budget": 0.3,
@@ -181,7 +249,9 @@
       "captureRate": 0.6278089887640449,
       "valueCaptured": 695.5,
       "valueCaptureRate": 0.691351888667992,
-      "efficiency": 0.8068592057761733
+      "efficiency": 0.8068592057761733,
+      "oracleValueCaptured": 848.0,
+      "pctOfOracle": 0.8201650943396226
     },
     {
       "budget": 0.3,
@@ -191,7 +261,9 @@
       "captureRate": 0.6292134831460674,
       "valueCaptured": 697.0,
       "valueCaptureRate": 0.6928429423459245,
-      "efficiency": 0.8086642599277978
+      "efficiency": 0.8086642599277978,
+      "oracleValueCaptured": 848.0,
+      "pctOfOracle": 0.8219339622641509
     },
     {
       "budget": 0.3,
@@ -201,7 +273,9 @@
       "captureRate": 0.6081460674157303,
       "valueCaptured": 695.5,
       "valueCaptureRate": 0.691351888667992,
-      "efficiency": 0.7815884476534296
+      "efficiency": 0.7815884476534296,
+      "oracleValueCaptured": 848.0,
+      "pctOfOracle": 0.8201650943396226
     },
     {
       "budget": 0.3,
@@ -211,7 +285,21 @@
       "captureRate": 0.6081460674157303,
       "valueCaptured": 695.5,
       "valueCaptureRate": 0.691351888667992,
-      "efficiency": 0.7815884476534296
+      "efficiency": 0.7815884476534296,
+      "oracleValueCaptured": 848.0,
+      "pctOfOracle": 0.8201650943396226
+    },
+    {
+      "budget": 0.3,
+      "strategy": "oracle",
+      "nContacted": 554,
+      "conversionsCaptured": 554,
+      "captureRate": 0.7780898876404494,
+      "valueCaptured": 848.0,
+      "valueCaptureRate": 0.8429423459244533,
+      "efficiency": 1.0,
+      "oracleValueCaptured": 848.0,
+      "pctOfOracle": 1.0
     },
     {
       "budget": 0.5,
@@ -221,7 +309,9 @@
       "captureRate": 0.5154494382022472,
       "valueCaptured": 531.5,
       "valueCaptureRate": 0.5283300198807157,
-      "efficiency": 0.3971861471861472
+      "efficiency": 0.3971861471861472,
+      "oracleValueCaptured": 1006.0,
+      "pctOfOracle": 0.5283300198807157
     },
     {
       "budget": 0.5,
@@ -231,7 +321,9 @@
       "captureRate": 0.8567415730337079,
       "valueCaptured": 887.5,
       "valueCaptureRate": 0.8822067594433399,
-      "efficiency": 0.6601731601731602
+      "efficiency": 0.6601731601731602,
+      "oracleValueCaptured": 1006.0,
+      "pctOfOracle": 0.8822067594433399
     },
     {
       "budget": 0.5,
@@ -241,7 +333,9 @@
       "captureRate": 0.8553370786516854,
       "valueCaptured": 886.5,
       "valueCaptureRate": 0.8812127236580517,
-      "efficiency": 0.6590909090909091
+      "efficiency": 0.6590909090909091,
+      "oracleValueCaptured": 1006.0,
+      "pctOfOracle": 0.8812127236580517
     },
     {
       "budget": 0.5,
@@ -251,7 +345,9 @@
       "captureRate": 0.8553370786516854,
       "valueCaptured": 887.0,
       "valueCaptureRate": 0.8817097415506958,
-      "efficiency": 0.6590909090909091
+      "efficiency": 0.6590909090909091,
+      "oracleValueCaptured": 1006.0,
+      "pctOfOracle": 0.8817097415506958
     },
     {
       "budget": 0.5,
@@ -261,7 +357,21 @@
       "captureRate": 0.8525280898876404,
       "valueCaptured": 884.5,
       "valueCaptureRate": 0.8792246520874751,
-      "efficiency": 0.6569264069264069
+      "efficiency": 0.6569264069264069,
+      "oracleValueCaptured": 1006.0,
+      "pctOfOracle": 0.8792246520874751
+    },
+    {
+      "budget": 0.5,
+      "strategy": "oracle",
+      "nContacted": 924,
+      "conversionsCaptured": 712,
+      "captureRate": 1.0,
+      "valueCaptured": 1006.0,
+      "valueCaptureRate": 1.0,
+      "efficiency": 0.7705627705627706,
+      "oracleValueCaptured": 1006.0,
+      "pctOfOracle": 1.0
     }
   ],
   "leadQueue": {
@@ -2701,6 +2811,33 @@
       "leadfund": 0.8792246520874751,
       "naiveSort": 0.8822067594433399,
       "gapPp": -0.3
+    }
+  },
+  "oracle": {
+    "0.05": {
+      "leadfund": 0.9565217391304348,
+      "naiveSort": 0.8007246376811594,
+      "oracleValue": 276.0
+    },
+    "0.1": {
+      "leadfund": 0.8974082073434125,
+      "naiveSort": 0.8369330453563715,
+      "oracleValue": 463.0
+    },
+    "0.2": {
+      "leadfund": 0.8509036144578314,
+      "naiveSort": 0.8298192771084337,
+      "oracleValue": 664.0
+    },
+    "0.3": {
+      "leadfund": 0.8201650943396226,
+      "naiveSort": 0.8201650943396226,
+      "oracleValue": 848.0
+    },
+    "0.5": {
+      "leadfund": 0.8792246520874751,
+      "naiveSort": 0.8822067594433399,
+      "oracleValue": 1006.0
     }
   }
 }
