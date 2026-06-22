@@ -51,6 +51,7 @@ export default function LeadQueue({ data, budget }) {
             <tr>
               <th className="px-4 py-3 font-medium">#</th>
               <th className="px-4 py-3 font-medium">Lead</th>
+              <th className="px-4 py-3 font-medium">Contact</th>
               <th className="px-4 py-3 font-medium">Value tier</th>
               <th className="px-4 py-3 text-right font-medium">Conv. prob</th>
               <th className="px-4 py-3 text-right font-medium">Value</th>
@@ -66,6 +67,9 @@ export default function LeadQueue({ data, budget }) {
                   <td className="nums px-4 py-2.5 text-slate-600">{i + 1}</td>
                   <td className="nums px-4 py-2.5 text-slate-300">
                     #{lead.leadNumber}
+                  </td>
+                  <td className="px-4 py-2.5 font-mono text-xs text-slate-400">
+                    {lead.contact}
                   </td>
                   <td className={`px-4 py-2.5 font-medium ${tierColor(tier)}`}>
                     {tier}
@@ -88,10 +92,18 @@ export default function LeadQueue({ data, budget }) {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-slate-600">
-        "Value" is a stated proxy (occupation-derived relative weight), not real
-        revenue — see the note below.
-      </p>
+      <div className="mt-3 space-y-1.5 text-xs text-slate-600">
+        <p>
+          Contact info is masked (shown as a lead ref number) — the X Education
+          dataset does not include phone or email fields. In a live deployment this
+          column would display the lead's actual phone number or email pulled from
+          the CRM.
+        </p>
+        <p>
+          "Value" is a stated proxy (occupation-derived relative weight), not real
+          revenue — see the note below.
+        </p>
+      </div>
     </section>
   );
 }

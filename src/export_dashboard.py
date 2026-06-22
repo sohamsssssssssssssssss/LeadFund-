@@ -110,6 +110,7 @@ def build_payload() -> dict:
                 "value": round(float(row[VALUE_COL]), 2),
                 "expectedScore": round(float(row["expected_score"]), 4),
                 "converted": int(row["Converted"]),
+                "contact": f"Lead ref #{int(row['Lead Number'])}",
             }
             for _, row in picks.iterrows()
         ]
