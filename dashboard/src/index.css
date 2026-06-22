@@ -35,3 +35,78 @@ body {
 .scroll-thin::-webkit-scrollbar-thumb {
   @apply bg-edge rounded-full;
 }
+
+/* ── Custom range slider — thick track, green fill, premium thumb ── */
+input[type="range"] {
+  accent-color: #34d399;
+  height: 10px;
+  cursor: pointer;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* WebKit track — the entire rail */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 4px;
+  background: #1c2433;
+}
+
+/* WebKit thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #34d399;
+  margin-top: -8px;
+  border: 3px solid #0d1320;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.35);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 28px rgba(52, 211, 153, 0.55);
+  transform: scale(1.12);
+}
+
+/* Firefox — filled (progress) portion in brand green */
+input[type="range"]::-moz-range-progress {
+  height: 6px;
+  border-radius: 4px 0 0 4px;
+  background: #34d399;
+}
+
+/* Firefox track */
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 4px;
+  background: #1c2433;
+}
+
+/* Firefox thumb */
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #34d399;
+  border: 3px solid #0d1320;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.35);
+}
+
+/* ── Subtle glow keyframe for the runner bar after race completes ── */
+@keyframes barWinGlow {
+  0%, 100% {
+    box-shadow: 0 0 0px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 12px currentColor;
+  }
+}
+
+.bar-win-glow {
+  animation: barWinGlow 2s ease-in-out 2;
+}

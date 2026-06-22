@@ -20,9 +20,14 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.65" },
         },
+        glowPulse: {
+          "0%, 100%": { opacity: "0.35", transform: "scale(1)" },
+          "50%": { opacity: "0.75", transform: "scale(1.12)" },
+        },
       },
       animation: {
         pulseGap: "pulseGap 1.8s ease-in-out infinite",
+        glowPulse: "glowPulse 2.5s ease-in-out infinite",
       },
     },
   },

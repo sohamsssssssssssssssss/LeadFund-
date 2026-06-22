@@ -72,9 +72,9 @@ export default function App() {
 
 function Stat({ label, value }) {
   return (
-    <div className="rounded-xl border border-edge bg-panel/50 px-4 py-2.5">
-      <div className="nums text-lg font-bold text-slate-100">{value}</div>
-      <div className="text-[11px] uppercase tracking-wider text-slate-500">
+    <div className="rounded-xl border border-white/10 bg-panel/50 px-5 py-3">
+      <div className="nums text-2xl font-bold text-slate-100">{value}</div>
+      <div className="text-xs uppercase tracking-wider text-slate-500">
         {label}
       </div>
     </div>

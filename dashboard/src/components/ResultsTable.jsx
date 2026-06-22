@@ -35,7 +35,7 @@ export default function ResultsTable({ data }) {
   });
 
   return (
-    <section className="rounded-3xl border border-edge bg-panel/40 p-6 sm:p-8">
+    <section className="rounded-3xl border border-white/[0.06] bg-panel/40 p-6 sm:p-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">

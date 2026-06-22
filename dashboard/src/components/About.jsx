@@ -7,7 +7,7 @@ import React from "react";
  */
 export default function About({ meta }) {
   return (
-    <section className="rounded-3xl border border-edge bg-panel/30 p-6 text-sm text-slate-400 sm:p-8">
+    <section className="rounded-3xl border border-white/[0.06] bg-panel/30 p-6 text-sm text-slate-400 sm:p-8">
       <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
         What's real, what's a proxy
       </p>

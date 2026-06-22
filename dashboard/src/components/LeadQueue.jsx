@@ -26,7 +26,7 @@ export default function LeadQueue({ data, budget }) {
   const leads = data.leadQueue[key] ?? [];
 
   return (
-    <section className="rounded-3xl border border-edge bg-panel/40 p-6 sm:p-8">
+    <section className="rounded-3xl border border-white/[0.06] bg-panel/40 p-6 sm:p-8">
       <div className="mb-1 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-sky-300">
